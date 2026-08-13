@@ -1,0 +1,35 @@
+name: indusense
+description: InduSense - Monitoramento Ambiental Industrial (Growth Get)
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Estado da aplicação
+  provider: ^6.1.2
+
+  # Rede / API
+  http: ^1.2.1
+
+  # Persistência local (sessão / token)
+  shared_preferences: ^2.2.3
+
+  # Gráficos do histórico
+  fl_chart: ^0.68.0
+
+  # Formatação de datas em pt-BR
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
