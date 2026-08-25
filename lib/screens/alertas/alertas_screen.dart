@@ -107,7 +107,9 @@ class _AlertasScreenState extends State<AlertasScreen> {
   }
 
   Widget _alertaCard(AlertModel alerta) {
-    final cor = statusColor(alerta.severidade.value);
+    // Ajustado para usar .name ou o valor enum diretamente
+    final cor = statusColor(alerta.severidade.name);
+    
     return Card(
       color: alerta.lido ? null : cor.withOpacity(0.04),
       child: InkWell(
@@ -137,9 +139,9 @@ class _AlertasScreenState extends State<AlertasScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${alerta.tipo.label} excedeu o limite: '
-                      '${alerta.valorMedido.toStringAsFixed(1)} ${alerta.tipo.unidade} '
-                      '(limite ${alerta.limite.toStringAsFixed(0)} ${alerta.tipo.unidade})',
+                      '${alerta.tipo.name.toUpperCase()} excedeu o limite: '
+                      '${alerta.valorMedido.toStringAsFixed(1)} '
+                      '(limite ${alerta.limite.toStringAsFixed(0)})',
                       style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                     ),
                     const SizedBox(height: 6),

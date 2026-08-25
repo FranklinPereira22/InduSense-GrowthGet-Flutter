@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; // IMPORTANTE
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'routes/app_routes.dart';
@@ -22,7 +23,15 @@ class InduSenseApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         locale: const Locale('pt', 'BR'),
-        supportedLocales: const [Locale('pt', 'BR')],
+        supportedLocales: const [
+          Locale('pt', 'BR'),
+        ],
+        // ADICIONADO: Delegados necessários para carregar as traduções e o Material Design correto
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         initialRoute: AppRoutes.splash,
         routes: AppRoutes.routes,
         onGenerateRoute: AppRoutes.onGenerateRoute,
