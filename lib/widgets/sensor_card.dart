@@ -76,23 +76,25 @@ class SensorCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 14),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    sensor.online
-                        ? '${sensor.valorAtual.toStringAsFixed(1)} ${sensor.tipo.unidade}'
-                        : '—',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
+              // Empilhado (não em Row+Spacer) para nunca estourar a
+              // largura do card em telas estreitas ou grids com 2+
+              // colunas — o valor pode ser longo (ex: "168.0 IQA").
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  sensor.online
+                      ? '${sensor.valorAtual.toStringAsFixed(1)} ${sensor.tipo.unidade}'
+                      : '—',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
-                  const Spacer(),
-                  StatusIndicator(status: sensor.status, compact: true),
-                ],
+                ),
               ),
+              const SizedBox(height: 8),
+              StatusIndicator(status: sensor.status, compact: true),
               const SizedBox(height: 8),
               Text(
                 'Atualizado às ${DateFormat('HH:mm').format(sensor.ultimaLeitura)}',
@@ -100,6 +102,8 @@ class SensorCard extends StatelessWidget {
                   color: AppColors.textSecondary,
                   fontSize: 11,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

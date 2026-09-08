@@ -20,6 +20,12 @@ class ApiConstants {
   static String sensorById(String id) => '/sensors/$id';
   static String sensorReadings(String id) => '/sensors/$id/readings';
 
+  // Salas / Setores (agrupamento físico dos sensores)
+  static const String salas = '/salas';
+  static String salaById(String id) => '/salas/$id';
+  static String salaSensors(String id) => '/salas/$id/sensors';
+  static String salaByNfcTag(String tagId) => '/salas/nfc/$tagId';
+
   // Histórico
   static const String readings = '/readings';
 

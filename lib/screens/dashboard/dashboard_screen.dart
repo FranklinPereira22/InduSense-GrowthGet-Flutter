@@ -2,10 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../models/sala_model.dart';
 import '../../models/sensor_model.dart';
 import '../../services/auth_provider.dart';
-import '../../services/sensor_service.dart';
-import '../../widgets/sensor_card.dart';
+import '../../services/sala_service.dart';
+import '../../widgets/sala_card.dart';
 import '../../widgets/state_widgets.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -16,9 +17,9 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final SensorService _sensorService = SensorService();
+  final SalaService _salaService = SalaService();
 
-  List<SensorModel>? _sensores;
+  List<SalaComSensores>? _salas;
   String? _erro;
   bool _carregando = true;
   Timer? _autoRefresh;
@@ -28,7 +29,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     _carregar();
     // Simula atualização em tempo real dos sensores IoT/ESP32.
-    _autoRefresh = Timer.periodic(const Duration(seconds: 30), (_) => _carregar(silencioso: true));
+    _autoRefresh = Timer.periodic(
+        const Duration(seconds: 30), (_) => _carregar(silencioso: true));
   }
 
   @override
@@ -45,16 +47,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
     }
     try {
-      final sensores = await _sensorService.getSensors();
+      final salas = await _salaService.getSalasComSensores();
       if (!mounted) return;
       setState(() {
-        _sensores = sensores;
+        _salas = salas;
         _carregando = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _erro = 'Não foi possível carregar os sensores.';
+        _erro = 'Não foi possível carregar as salas.';
         _carregando = false;
       });
     }
@@ -74,6 +76,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(width: 4),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).pushNamed('/nfc-scan'),
+        icon: const Icon(Icons.nfc),
+        label: const Text('Escanear sala'),
+      ),
       body: RefreshIndicator(
         onRefresh: _carregar,
         child: _buildBody(user?.nome),
@@ -82,26 +89,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildBody(String? nomeUsuario) {
-    if (_carregando) return const LoadingWidget(mensagem: 'Carregando sensores...');
+    if (_carregando) return const LoadingWidget(mensagem: 'Carregando salas...');
     if (_erro != null) {
       return AppErrorWidget(mensagem: _erro!, onRetry: _carregar);
     }
-    final sensores = _sensores ?? [];
-    if (sensores.isEmpty) {
+    final salas = _salas ?? [];
+    if (salas.isEmpty) {
       return const EmptyStateWidget(
-        icon: Icons.sensors_off_outlined,
-        titulo: 'Nenhum sensor encontrado',
-        mensagem: 'Cadastre um sensor ESP32/IoT para começar o monitoramento.',
+        icon: Icons.meeting_room_outlined,
+        titulo: 'Nenhuma sala cadastrada',
+        mensagem: 'Cadastre uma sala e vincule os sensores ESP32/IoT a ela.',
       );
     }
 
-    final criticos = sensores.where((s) => s.status == SensorStatus.critico).length;
-    final atencao = sensores.where((s) => s.status == SensorStatus.atencao).length;
-    final normais = sensores.where((s) => s.status == SensorStatus.normal).length;
-    final offline = sensores.where((s) => !s.online).length;
+    final todosSensores = salas.expand((s) => s.sensores).toList();
+    final criticos =
+        todosSensores.where((s) => s.status == SensorStatus.critico).length;
+    final atencao =
+        todosSensores.where((s) => s.status == SensorStatus.atencao).length;
+    final normais =
+        todosSensores.where((s) => s.status == SensorStatus.normal).length;
+    final offline = todosSensores.where((s) => !s.online).length;
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       children: [
         if (nomeUsuario != null) ...[
           Text('Olá, $nomeUsuario 👋',
@@ -111,59 +122,87 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(color: AppColors.textSecondary)),
           const SizedBox(height: 20),
         ],
-        Row(
-          children: [
-            _resumoChip('Normal', normais, AppColors.statusNormal),
-            const SizedBox(width: 8),
-            _resumoChip('Atenção', atencao, AppColors.statusAtencao),
-            const SizedBox(width: 8),
-            _resumoChip('Crítico', criticos, AppColors.statusCritico),
-            const SizedBox(width: 8),
-            _resumoChip('Offline', offline, AppColors.statusOffline),
-          ],
-        ),
-        const SizedBox(height: 20),
-        const Text('Sensores', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 12),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: sensores.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.85,
-          ),
-          itemBuilder: (context, index) {
-            final sensor = sensores[index];
-            return SensorCard(
-              sensor: sensor,
-              onTap: () => Navigator.of(context)
-                  .pushNamed('/sensor-detalhe', arguments: sensor.id),
+        // LayoutBuilder garante que os 4 chips de resumo nunca estourem
+        // a largura em telas pequenas: eles quebram em 2 linhas se
+        // necessário, em vez de forçar 4 colunas fixas.
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final chips = [
+              _resumoChip('Normal', normais, AppColors.statusNormal),
+              _resumoChip('Atenção', atencao, AppColors.statusAtencao),
+              _resumoChip('Crítico', criticos, AppColors.statusCritico),
+              _resumoChip('Offline', offline, AppColors.statusOffline),
+            ];
+            final larguraItem = (constraints.maxWidth - 24) / 4;
+            if (larguraItem >= 70) {
+              return Row(
+                children: [
+                  for (int i = 0; i < chips.length; i++) ...[
+                    Expanded(child: chips[i]),
+                    if (i != chips.length - 1) const SizedBox(width: 8),
+                  ],
+                ],
+              );
+            }
+            // Tela muito estreita: 2 colunas x 2 linhas.
+            return Column(
+              children: [
+                Row(children: [
+                  Expanded(child: chips[0]),
+                  const SizedBox(width: 8),
+                  Expanded(child: chips[1]),
+                ]),
+                const SizedBox(height: 8),
+                Row(children: [
+                  Expanded(child: chips[2]),
+                  const SizedBox(width: 8),
+                  Expanded(child: chips[3]),
+                ]),
+              ],
             );
           },
         ),
+        const SizedBox(height: 24),
+        const Text('Salas',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        const Text(
+          'Toque em uma sala para ver os sensores, ou use a tag NFC na porta.',
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+        ),
+        const SizedBox(height: 12),
+        ...salas.map((sala) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: SalaCard(
+                salaComSensores: sala,
+                onTap: () => Navigator.of(context)
+                    .pushNamed('/sala-detalhe', arguments: sala.sala.id),
+              ),
+            )),
       ],
     );
   }
 
   Widget _resumoChip(String label, int valor, Color cor) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: cor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Text('$valor',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: cor)),
-            const SizedBox(height: 2),
-            Text(label, style: TextStyle(fontSize: 11, color: cor)),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+      decoration: BoxDecoration(
+        color: cor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('$valor',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: cor)),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(fontSize: 11, color: cor),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

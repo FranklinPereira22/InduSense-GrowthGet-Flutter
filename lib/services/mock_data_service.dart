@@ -1,5 +1,6 @@
 import '../models/alert_model.dart';
 import '../models/reading_model.dart';
+import '../models/sala_model.dart';
 import '../models/sensor_model.dart';
 import '../models/user_model.dart';
 
@@ -17,6 +18,46 @@ class MockDataService {
 
   static UserModel get mockUser => _mockUser;
 
+  /// Salas/setores da fábrica. Cada uma tem uma tag NFC fixada na porta.
+  static List<SalaModel> get salas => [
+        SalaModel(
+          id: 'sala1',
+          nome: 'Linha de Produção A',
+          setor: 'Galpão 1',
+          nfcTagId: 'NFC-GALPAO1-LINHA-A',
+        ),
+        SalaModel(
+          id: 'sala2',
+          nome: 'Estoque Químico',
+          setor: 'Galpão 2',
+          nfcTagId: 'NFC-GALPAO2-ESTOQUE',
+        ),
+        SalaModel(
+          id: 'sala3',
+          nome: 'Setor de Solda',
+          setor: 'Galpão 1',
+          nfcTagId: 'NFC-GALPAO1-SOLDA',
+        ),
+        SalaModel(
+          id: 'sala4',
+          nome: 'Casa de Máquinas',
+          setor: 'Manutenção',
+          nfcTagId: 'NFC-CASA-MAQUINAS',
+        ),
+        SalaModel(
+          id: 'sala5',
+          nome: 'Câmara Fria',
+          setor: 'Galpão 3',
+          nfcTagId: 'NFC-GALPAO3-CAMARA-FRIA',
+        ),
+        SalaModel(
+          id: 'sala6',
+          nome: 'Cabine de Pintura',
+          setor: 'Galpão 2',
+          nfcTagId: 'NFC-GALPAO2-PINTURA',
+        ),
+      ];
+
   static List<SensorModel> get sensors {
     final now = DateTime.now();
     return [
@@ -24,6 +65,7 @@ class MockDataService {
         id: 's1',
         nome: 'Sensor Temp — Linha A',
         localizacao: 'Galpão 1 · Linha de Produção A',
+        salaId: 'sala1',
         tipo: SensorType.temperatura,
         status: SensorStatus.normal,
         valorAtual: 24.6,
@@ -36,6 +78,7 @@ class MockDataService {
         id: 's2',
         nome: 'Sensor Umidade — Estoque',
         localizacao: 'Galpão 2 · Estoque Químico',
+        salaId: 'sala2',
         tipo: SensorType.umidade,
         status: SensorStatus.atencao,
         valorAtual: 78.0,
@@ -48,6 +91,7 @@ class MockDataService {
         id: 's3',
         nome: 'Qualidade do Ar — Solda',
         localizacao: 'Galpão 1 · Setor de Solda',
+        salaId: 'sala3',
         tipo: SensorType.qualidadeAr,
         status: SensorStatus.critico,
         valorAtual: 168,
@@ -57,9 +101,23 @@ class MockDataService {
         online: true,
       ),
       SensorModel(
+        id: 's3b',
+        nome: 'Sensor Gás — Solda',
+        localizacao: 'Galpão 1 · Setor de Solda',
+        salaId: 'sala3',
+        tipo: SensorType.gas,
+        status: SensorStatus.atencao,
+        valorAtual: 36.5,
+        limiteMin: 0,
+        limiteMax: 35,
+        ultimaLeitura: now.subtract(const Duration(minutes: 2)),
+        online: true,
+      ),
+      SensorModel(
         id: 's4',
         nome: 'Sensor Gás — Caldeira',
         localizacao: 'Casa de Máquinas',
+        salaId: 'sala4',
         tipo: SensorType.gas,
         status: SensorStatus.normal,
         valorAtual: 12.4,
@@ -69,9 +127,23 @@ class MockDataService {
         online: true,
       ),
       SensorModel(
+        id: 's4b',
+        nome: 'Sensor Temp — Caldeira',
+        localizacao: 'Casa de Máquinas',
+        salaId: 'sala4',
+        tipo: SensorType.temperatura,
+        status: SensorStatus.normal,
+        valorAtual: 31.2,
+        limiteMin: 10,
+        limiteMax: 45,
+        ultimaLeitura: now.subtract(const Duration(minutes: 1)),
+        online: true,
+      ),
+      SensorModel(
         id: 's5',
         nome: 'Sensor Temp — Câmara Fria',
         localizacao: 'Galpão 3 · Câmara Fria',
+        salaId: 'sala5',
         tipo: SensorType.temperatura,
         status: SensorStatus.offline,
         valorAtual: 0,
@@ -84,11 +156,25 @@ class MockDataService {
         id: 's6',
         nome: 'Sensor Gás — Pintura',
         localizacao: 'Galpão 2 · Cabine de Pintura',
+        salaId: 'sala6',
         tipo: SensorType.gas,
         status: SensorStatus.atencao,
         valorAtual: 41.2,
         limiteMin: 0,
         limiteMax: 40,
+        ultimaLeitura: now.subtract(const Duration(minutes: 4)),
+        online: true,
+      ),
+      SensorModel(
+        id: 's6b',
+        nome: 'Qualidade do Ar — Pintura',
+        localizacao: 'Galpão 2 · Cabine de Pintura',
+        salaId: 'sala6',
+        tipo: SensorType.qualidadeAr,
+        status: SensorStatus.normal,
+        valorAtual: 42,
+        limiteMin: 0,
+        limiteMax: 100,
         ultimaLeitura: now.subtract(const Duration(minutes: 4)),
         online: true,
       ),

@@ -129,12 +129,25 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                   child: LineChart(
                     LineChartData(
                       gridData: const FlGridData(show: true, drawVerticalLine: false),
-                      titlesData: const FlTitlesData(
-                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      titlesData: FlTitlesData(
+                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                         leftTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: true, reservedSize: 36),
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 40,
+                            getTitlesWidget: (value, meta) => Padding(
+                              padding: const EdgeInsets.only(right: 4),
+                              child: Text(
+                                value.toStringAsFixed(0),
+                                style: const TextStyle(
+                                    fontSize: 11, color: AppColors.textSecondary),
+                                maxLines: 1,
+                                overflow: TextOverflow.visible,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       borderData: FlBorderData(show: false),

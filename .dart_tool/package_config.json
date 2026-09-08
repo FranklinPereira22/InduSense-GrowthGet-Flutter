@@ -21,7 +21,7 @@
     },
     {
       "name": "clock",
-      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/clock-1.1.2",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/clock-1.1.3",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -158,10 +158,28 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "ndef_record",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/ndef_record-1.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.11"
+    },
+    {
       "name": "nested",
       "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/nested-1.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "nfc_manager",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/nfc_manager-4.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.11"
+    },
+    {
+      "name": "nfc_manager_ndef",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/nfc_manager_ndef-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
     },
     {
       "name": "path",
@@ -189,9 +207,9 @@
     },
     {
       "name": "platform",
-      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/platform-3.1.6",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/platform-3.2.0",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.10"
     },
     {
       "name": "plugin_platform_interface",
@@ -213,15 +231,15 @@
     },
     {
       "name": "shared_preferences_android",
-      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.27",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.28",
       "packageUri": "lib/",
       "languageVersion": "3.12"
     },
     {
       "name": "shared_preferences_foundation",
-      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.6",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.7",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "shared_preferences_linux",
@@ -261,7 +279,7 @@
     },
     {
       "name": "stack_trace",
-      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/stack_trace-1.12.1",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/stack_trace-1.12.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },

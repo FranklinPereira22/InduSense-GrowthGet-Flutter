@@ -72,6 +72,7 @@ class SensorModel {
   final String id;
   final String nome;
   final String localizacao;
+  final String salaId;
   final SensorType tipo;
   final SensorStatus status;
   final double valorAtual;
@@ -84,6 +85,7 @@ class SensorModel {
     required this.id,
     required this.nome,
     required this.localizacao,
+    required this.salaId,
     required this.tipo,
     required this.status,
     required this.valorAtual,
@@ -98,6 +100,7 @@ class SensorModel {
       id: json['id'].toString(),
       nome: json['nome'] ?? '',
       localizacao: json['localizacao'] ?? '',
+      salaId: json['salaId']?.toString() ?? '',
       tipo: SensorTypeX.fromString(json['tipo'] ?? 'temperatura'),
       status: SensorStatusX.fromString(json['status'] ?? 'offline'),
       valorAtual: (json['valorAtual'] as num).toDouble(),
@@ -112,6 +115,7 @@ class SensorModel {
         'id': id,
         'nome': nome,
         'localizacao': localizacao,
+        'salaId': salaId,
         'tipo': tipo.name,
         'status': status.value,
         'valorAtual': valorAtual,

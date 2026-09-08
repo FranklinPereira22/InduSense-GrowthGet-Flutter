@@ -1,227 +1,221 @@
 # InduSense — Monitoramento Ambiental Industrial (Growth Get)
 
 App Flutter/FlutterFlow para monitoramento em tempo real de sensores
-IoT/ESP32 (temperatura, umidade, qualidade do ar e gases), com histórico,
-alertas e gestão de perfil. Backend: Nest.js + PostgreSQL, API REST/JSON.
+IoT/ESP32 (temperatura, umidade, qualidade do ar e gases), agora
+**organizado por sala/setor** e com **leitura de tag NFC na porta**
+para abrir os sensores daquele ambiente automaticamente. Backend:
+Nest.js + PostgreSQL, API REST/JSON.
 
-## 1. Estrutura de pastas
+## Changelog desta revisão
+
+- ✅ Corrigido o overflow "RIGHT OVERFLOWED BY N PIXELS" nos cards do
+  Dashboard (o valor + status pill agora empilham em vez de dividir
+  uma `Row` com `Spacer`, e usam `FittedBox` para nunca estourar).
+- ✅ Corrigido o wrap quebrado dos rótulos do eixo Y nos gráficos
+  (Histórico e Detalhe do Sensor) — labels sem casas decimais e
+  `reservedSize` maior.
+- ✅ Grid de sensores trocado de `childAspectRatio` fixo para
+  `SliverGridDelegateWithMaxCrossAxisExtent`, que adapta o número de
+  colunas ao tamanho real da tela (celular pequeno, celular grande,
+  tablet) em vez de sempre forçar 2 colunas.
+- ✅ **Novo:** Dashboard agora agrupa os sensores por **sala/setor**
+  (`SalaModel`), mostrando o status geral de cada sala e navegando
+  para a lista de sensores daquela sala ao tocar.
+- ✅ **Novo:** tela de **leitura de tag NFC** (`/nfc-scan`) — ao
+  aproximar o celular da tag fixada na porta da sala, o app resolve
+  automaticamente qual sala é e abre a lista de sensores dela.
+
+## 1. Estrutura de pastas (atualizada)
 
 ```
 lib/
-├── main.dart                        # bootstrap + MultiProvider + MaterialApp
+├── main.dart
 ├── core/
-│   ├── theme/app_theme.dart         # cores, tema Material 3, statusColor()
-│   └── constants/api_constants.dart # baseUrl, endpoints, flag useMock
+│   ├── theme/app_theme.dart
+│   └── constants/api_constants.dart
 ├── models/
-│   ├── user_model.dart              # UserModel, AuthResponse
-│   ├── sensor_model.dart            # SensorModel, SensorType, SensorStatus
-│   ├── reading_model.dart           # ReadingModel (histórico)
-│   └── alert_model.dart             # AlertModel
+│   ├── user_model.dart
+│   ├── sensor_model.dart          # + campo salaId
+│   ├── sala_model.dart            # NOVO: SalaModel, SalaComSensores
+│   ├── reading_model.dart
+│   └── alert_model.dart
 ├── services/
-│   ├── api_client.dart              # wrapper HTTP (GET/POST/PATCH) + token
-│   ├── auth_service.dart            # login, cadastro, logout, sessão
-│   ├── auth_provider.dart           # ChangeNotifier de sessão (Provider)
-│   ├── sensor_service.dart          # sensores + leituras/histórico
-│   ├── alert_service.dart           # alertas + marcar como lido
-│   └── mock_data_service.dart       # dados fictícios (useMock = true)
+│   ├── api_client.dart
+│   ├── auth_service.dart
+│   ├── auth_provider.dart
+│   ├── sensor_service.dart
+│   ├── sala_service.dart          # NOVO: agrupamento por sala + NFC→sala
+│   ├── nfc_service.dart           # NOVO: leitura de tags via nfc_manager
+│   ├── alert_service.dart
+│   └── mock_data_service.dart     # + salas mockadas
 ├── widgets/
-│   ├── sensor_card.dart             # card de sensor (dashboard)
-│   ├── status_indicator.dart        # pílula normal/atenção/crítico/offline
-│   └── state_widgets.dart           # Loading / EmptyState / AppError
+│   ├── sensor_card.dart           # corrigido (sem overflow)
+│   ├── sala_card.dart             # NOVO: card de sala no dashboard
+│   ├── status_indicator.dart
+│   └── state_widgets.dart
 ├── screens/
 │   ├── splash/splash_screen.dart
 │   ├── auth/login_screen.dart
 │   ├── auth/cadastro_screen.dart
-│   ├── dashboard/dashboard_screen.dart
-│   ├── historico/historico_screen.dart
-│   ├── sensor_detail/sensor_detail_screen.dart
+│   ├── dashboard/dashboard_screen.dart   # reescrito: lista de salas
+│   ├── sala_detail/sala_detail_screen.dart # NOVO: sensores de 1 sala
+│   ├── nfc/nfc_scan_screen.dart          # NOVO: tela de leitura NFC
+│   ├── historico/historico_screen.dart   # gráfico corrigido
+│   ├── sensor_detail/sensor_detail_screen.dart # gráfico corrigido
 │   ├── alertas/alertas_screen.dart
 │   ├── configuracoes/configuracoes_screen.dart
-│   └── home_shell.dart              # bottom navigation (4 abas)
-└── routes/app_routes.dart           # rotas nomeadas
+│   └── home_shell.dart
+└── routes/app_routes.dart          # + /sala-detalhe, /nfc-scan
 ```
 
-Camadas separadas: **UI** (screens/widgets) → **services** (regra de
-negócio + chamada de API) → **models** (contratos de dados). As telas
-nunca chamam `http` diretamente; sempre passam por um service.
-
-## 2. Navegação
-
-Rotas nomeadas (`AppRoutes`), com `HomeShell` (bottom navigation) agrupando
-Dashboard, Histórico, Alertas e Perfil:
+## 2. Navegação (atualizada)
 
 ```
-/            → SplashScreen        (checa sessão salva)
-/login       → LoginScreen
-/cadastro    → CadastroScreen
-/dashboard   → HomeShell(aba 0)    → DashboardScreen
-/historico   → HomeShell(aba 1)    → HistoricoScreen
-/alertas     → HomeShell(aba 2)    → AlertasScreen
-/configuracoes → HomeShell(aba 3) → ConfiguracoesScreen
-/sensor-detalhe → SensorDetailScreen (argumento: sensorId String)
+/            → Splash
+/login       → Login
+/cadastro    → Cadastro
+/dashboard   → HomeShell(0) → Dashboard (lista de SALAS)
+/historico   → HomeShell(1) → Histórico
+/alertas     → HomeShell(2) → Alertas
+/configuracoes → HomeShell(3) → Perfil
+/sala-detalhe   → SalaDetailScreen  (arg: salaId)   → sensores da sala
+/sensor-detalhe → SensorDetailScreen (arg: sensorId) → gráfico do sensor
+/nfc-scan       → NfcScanScreen → lê a tag e navega para /sala-detalhe
 ```
 
-Fluxo: Splash decide entre `/login` e `/dashboard` conforme sessão salva
-em `SharedPreferences`. Logout limpa o token e retorna para `/login`
-(`pushNamedAndRemoveUntil`).
+Fluxo do NFC: `NfcScanScreen` inicia uma sessão de leitura
+(`NfcService`); ao detectar uma tag, extrai um identificador de texto
+(NDEF) ou o serial de hardware como fallback; esse identificador é
+resolvido para uma sala via `SalaService.getSalaPorTagNfc`; em caso de
+sucesso, navega (`pushReplacementNamed`) direto para `/sala-detalhe`
+com os sensores daquele ambiente.
 
-## 3. Models (resumo dos campos)
+## 3. Models (novo: Sala)
 
 | Model | Campos principais |
 |---|---|
-| `UserModel` | id, nome, email, cargo?, empresa? |
-| `SensorModel` | id, nome, localizacao, tipo (enum), status (enum), valorAtual, limiteMin, limiteMax, ultimaLeitura, online |
-| `ReadingModel` | id, sensorId, sensorNome, tipo, valor, dataHora, status |
-| `AlertModel` | id, sensorId, sensorNome, tipo, valorMedido, limite, dataHora, lido, severidade |
+| `SalaModel` | id, nome, setor, **nfcTagId** |
+| `SalaComSensores` | sala (`SalaModel`), sensores (`List<SensorModel>`), `statusGeral` (getter: pior status entre os sensores), `totalAlertas` (getter) |
+| `SensorModel` | ... campos já existentes + **salaId** (referencia a sala) |
 
-`SensorType` = temperatura \| umidade \| qualidadeAr \| gas
-`SensorStatus` = normal \| atencao \| critico \| offline
+## 4. Endpoints novos (Nest.js) + JSON
 
-## 4. Endpoints esperados (Nest.js) + JSON
+### Salas
 
-> `ApiConstants.baseUrl` = `https://api.indusense.growthget.com/v1`
-> (ajustar para o ambiente real). Todas as rotas autenticadas usam
-> `Authorization: Bearer <token>`.
-
-### Autenticação
-
-**POST `/auth/login`**
-```json
-// Request
-{ "email": "carlos@growthget.com", "senha": "123456" }
-// Response 200
-{
-  "token": "jwt...",
-  "user": { "id": "u1", "nome": "Carlos Andrade", "email": "carlos@growthget.com" }
-}
-```
-
-**POST `/auth/register`**
-```json
-// Request
-{ "nome": "Maria Silva", "email": "maria@growthget.com", "senha": "123456", "empresa": "Growth Get" }
-// Response 201 → mesmo formato de /auth/login
-```
-
-**POST `/auth/logout`** → 204 (sem corpo)
-**GET `/auth/me`** → retorna `UserModel` do usuário logado (para restaurar sessão)
-
-### Sensores
-
-**GET `/sensors`**
+**GET `/salas`**
 ```json
 [
-  {
-    "id": "s1",
-    "nome": "Sensor Temp — Linha A",
-    "localizacao": "Galpão 1 · Linha de Produção A",
-    "tipo": "temperatura",
-    "status": "normal",
-    "valorAtual": 24.6,
-    "limiteMin": 15,
-    "limiteMax": 35,
-    "ultimaLeitura": "2026-08-13T14:02:00Z",
-    "online": true
-  }
+  { "id": "sala1", "nome": "Linha de Produção A", "setor": "Galpão 1", "nfcTagId": "NFC-GALPAO1-LINHA-A" }
 ]
 ```
 
-**GET `/sensors/:id`** → objeto único no mesmo formato acima.
+**GET `/salas/:id`** → objeto único no formato acima.
 
-### Histórico
+**GET `/salas/:id/sensors`** → lista de `SensorModel` (mesmo formato do endpoint `/sensors`), filtrados por sala.
 
-**GET `/readings?sensorId=&tipo=&inicio=&fim=`**
+**GET `/salas/nfc/:tagId`** → resolve a sala a partir do identificador
+gravado na tag NFC. Retorna 404 se nenhuma sala estiver associada.
 ```json
-[
-  {
-    "id": "s1-r0",
-    "sensorId": "s1",
-    "sensorNome": "Sensor Temp — Linha A",
-    "tipo": "temperatura",
-    "valor": 24.6,
-    "dataHora": "2026-08-13T14:02:00Z",
-    "status": "normal"
-  }
-]
+// GET /salas/nfc/NFC-GALPAO1-LINHA-A
+{ "id": "sala1", "nome": "Linha de Produção A", "setor": "Galpão 1", "nfcTagId": "NFC-GALPAO1-LINHA-A" }
 ```
 
-### Alertas
+> `SensorModel` agora inclui `"salaId": "sala1"` no JSON de resposta de
+> `/sensors` e `/sensors/:id`, para permitir agrupamento no cliente
+> mesmo sem chamar `/salas/:id/sensors`.
 
-**GET `/alerts`**
-```json
-[
-  {
-    "id": "a1",
-    "sensorId": "s3",
-    "sensorNome": "Qualidade do Ar — Solda",
-    "tipo": "qualidade_ar",
-    "valorMedido": 168,
-    "limite": 100,
-    "dataHora": "2026-08-13T14:00:00Z",
-    "lido": false,
-    "severidade": "critico"
-  }
-]
+## 5. Configuração nativa para NFC
+
+O pacote usado é `nfc_manager`. Como este pacote depende de código
+nativo, é necessário configurar Android e iOS **depois** de rodar
+`flutter create .` no projeto (caso ainda não existam as pastas
+`android/` e `ios/`):
+
+### Android (`android/app/src/main/AndroidManifest.xml`)
+```xml
+<uses-permission android:name="android.permission.NFC" />
+<uses-feature android:name="android.hardware.nfc" android:required="false" />
 ```
+`required="false"` permite instalar em aparelhos sem NFC — a tela
+`NfcScanScreen` já trata esse caso (`NfcService.isDisponivel()`) e
+mostra uma mensagem clara em vez de travar.
 
-**PATCH `/alerts/:id/read`** → 204, marca o alerta como lido.
+### iOS (`ios/Runner/Info.plist`)
+```xml
+<key>NFCReaderUsageDescription</key>
+<string>Usamos NFC para identificar a sala ao aproximar da tag na porta.</string>
+```
+E em **Signing & Capabilities** (Xcode), habilitar "Near Field
+Communication Tag Reading". Isso gera automaticamente a entitlement
+`com.apple.developer.nfc.readersession.formats`.
 
-## 5. Código completo dos arquivos principais
+### Tags NFC recomendadas
+Tags NTAG213/215/216 (NFC Forum Type 2), graváveis com um registro
+NDEF de texto simples contendo o identificador da sala (ex.:
+`NFC-GALPAO1-LINHA-A`). Podem ser gravadas com qualquer app leitor/
+gravador de NFC antes de fixar na porta.
 
-Todos os arquivos foram entregues no ZIP anexo (`indusense_flutter.zip`),
-já organizados na estrutura acima. Pontos de destaque:
+## 6. Correções de responsividade (detalhe técnico)
 
-- **`api_client.dart`**: único ponto de chamada HTTP, trata token, timeout
-  (15s), erros de rede e mapeia `401` para "Sessão expirada".
-- **`mock_data_service.dart`**: dados fictícios (6 sensores, 24 leituras
-  cada, 4 alertas) usados enquanto `ApiConstants.useMock = true` — **basta
-  trocar essa flag para `false`** para consumir a API real, sem alterar
-  nenhuma tela.
-- Toda tela de listagem trata 3 estados: **carregando** (`LoadingWidget`),
-  **vazio** (`EmptyStateWidget`) e **erro** (`AppErrorWidget` com botão
-  "Tentar novamente").
-- Dashboard atualiza sensores a cada 30s (`Timer.periodic`) simulando
-  tempo real; pode ser substituído por WebSocket/polling real no service.
+- **`SensorCard`**: o valor (`24.6 °C`) e o status (`Normal`) estavam
+  na mesma `Row` com `Spacer()`; em grids de 2+ colunas ou telas
+  estreitas, a soma das larguras passava do disponível → overflow.
+  Agora ficam empilhados (`Column`), e o valor usa `FittedBox` para
+  encolher se necessário (ex.: `168.0 IQA` em um card pequeno).
+- **Gráficos (`fl_chart`)**: os rótulos do eixo Y quebravam linha no
+  meio do número (`26.` / `6`) porque o texto com casas decimais não
+  cabia na largura reservada. Agora os rótulos são inteiros
+  (`toStringAsFixed(0)`) e a largura reservada aumentou de 36 para 40.
+- **Grid do Dashboard/Sala**: trocado `childAspectRatio` fixo por
+  `SliverGridDelegateWithMaxCrossAxisExtent` (190 lógico px por
+  célula) — o Flutter calcula sozinho quantas colunas cabem, então o
+  mesmo código funciona bem em celular pequeno, celular grande e
+  tablet, sem overflow vertical nem horizontal.
+- **Chips de resumo do Dashboard**: agora usam `LayoutBuilder` para
+  decidir entre 4 colunas (telas normais) ou 2x2 (telas muito
+  estreitas), em vez de forçar 4 `Expanded` fixos.
 
-## 6. Configurações necessárias no FlutterFlow
+## 7. Configurações necessárias no FlutterFlow
 
-Para importar/recriar este projeto no FlutterFlow:
+Além do que já estava documentado (Custom Data Types, API Calls, App
+State, tema, `fl_chart`/`intl`):
 
-1. **Custom Code → Actions/Functions**: reaproveitar `api_client.dart`,
-   `auth_service.dart`, `sensor_service.dart` e `alert_service.dart` como
-   **Custom Actions**, retornando os models como `Custom Data Types`.
-2. **Custom Data Types**: criar `SensorModel`, `ReadingModel`,
-   `AlertModel`, `UserModel` no FlutterFlow espelhando os campos da
-   seção 3, com os mesmos nomes/tipos usados no JSON de resposta.
-3. **API Calls (FlutterFlow API Manager)**: cadastrar as chamadas da
-   seção 4 (método, URL, headers `Authorization: Bearer [token_app_state]`,
-   body JSON), habilitando "Make API Call on Widget Load" no Dashboard,
-   Histórico e Alertas.
-4. **App State (variáveis globais)**: `authToken` (string, persisted),
-   `currentUser` (Custom Data Type UserModel, persisted), `isLoggedIn`
-   (bool, persisted) — usados para a lógica de sessão/logout.
-5. **Página inicial condicional**: configurar "Initial Action" da
-   página Splash chamando a action de restaurar sessão e navegando
-   condicionalmente para Login ou Dashboard.
-6. **Tema**: em Theme Settings, replicar a paleta de
-   `core/theme/app_theme.dart` (Primary `#0B5FFF`, Success `#1FAE64`,
-   Warning `#F5A623`, Error `#E23D3D`, Background `#F4F6F9`).
-7. **Pacotes/Dependências (Custom Package/pub.dev)**: adicionar
-   `fl_chart` (gráficos do Histórico/Detalhe do Sensor) e `intl`
-   (formatação de datas em pt-BR) em Settings → App Dependencies.
-8. **Navegação**: replicar as rotas da seção 2, usando um
-   "Bottom Navigation Bar" component como página wrapper (equivalente
-   ao `HomeShell`) para Dashboard/Histórico/Alertas/Perfil.
-9. **Idioma**: definir `pt-BR` como idioma padrão único em
-   App Settings → Localization.
+1. **Custom Data Type `SalaModel`**: campos `id`, `nome`, `setor`,
+   `nfcTagId` (todos String).
+2. **API Calls novas**: `GET /salas`, `GET /salas/:id/sensors`,
+   `GET /salas/nfc/:tagId` — habilitar "Available in Custom Actions"
+   para poder chamá-las a partir da action de leitura NFC.
+3. **NFC não tem widget nativo no FlutterFlow.** É necessário criar
+   uma **Custom Action** em Dart que:
+   - importe `nfc_manager`;
+   - inicie a sessão (`NfcManager.instance.startSession`);
+   - no callback `onDiscovered`, extraia o identificador da tag
+     (mesma lógica de `lib/services/nfc_service.dart`, que pode ser
+     colada quase inteira dentro da Custom Action);
+   - retorne o `tagId` (String) para a página, que então chama a API
+     `GET /salas/nfc/:tagId` e navega para a página de detalhe da sala
+     passando o `salaId` retornado.
+4. **Página "Escanear Sala"**: um botão/FAB no Dashboard chamando essa
+   Custom Action; enquanto aguarda, mostrar um ícone de NFC animado
+   (Lottie ou ícone estático) — replicando `NfcScanScreen`.
+5. **Dashboard**: trocar o Repeating Element de "sensores" por um
+   Repeating Element de "salas" (`GET /salas` combinado com a contagem
+   de sensores por sala), navegando para uma página "Detalhe da Sala"
+   que lista os sensores filtrados por `salaId`.
+6. **Permissões nativas**: em Project Settings → Permissions,
+   habilitar NFC (Android) e, no build exportado para Xcode, adicionar
+   a capability "Near Field Communication Tag Reading" antes de
+   publicar na App Store.
 
-## 7. Rodando localmente (Flutter puro)
+## 8. Rodando localmente (Flutter puro)
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-O app já funciona 100% com dados mockados (`ApiConstants.useMock = true`).
-Para conectar ao backend Nest.js real, altere `useMock` para `false` e
-ajuste `baseUrl` em `lib/core/constants/api_constants.dart`.
+Funciona 100% com dados mockados (`ApiConstants.useMock = true`),
+incluindo o botão **"Simular leitura (modo teste)"** na tela de NFC,
+útil para testar o fluxo em emuladores ou aparelhos sem chip NFC.
+Para conectar à API real, altere `useMock` para `false` e ajuste
+`baseUrl` em `lib/core/constants/api_constants.dart`.
