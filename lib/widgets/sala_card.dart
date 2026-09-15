@@ -19,70 +19,95 @@ class SalaCard extends StatelessWidget {
     final totalSensores = salaComSensores.sensores.length;
     final alertasAtivos = salaComSensores.totalAlertas;
 
-    return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)), // Borda neutra corporativa
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9), // Fundo neutro Slate
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.factory_outlined, // Ícone industrial
+                    color: Color(0xFF1E293B),
+                    size: 24,
+                  ),
                 ),
-                child: Icon(Icons.meeting_room_outlined, color: color, size: 26),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      sala.nome,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      sala.setor,
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        StatusIndicator(status: status, compact: true),
-                        Text(
-                          '$totalSensores sensor${totalSensores == 1 ? '' : 'es'}',
-                          style: const TextStyle(
-                              color: AppColors.textSecondary, fontSize: 12),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        sala.nome,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Color(0xFF1E293B),
                         ),
-                        if (alertasAtivos > 0)
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        sala.setor,
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          StatusIndicator(status: status, compact: true),
                           Text(
-                            '· $alertasAtivos alerta${alertasAtivos == 1 ? '' : 's'}',
-                            style: TextStyle(
-                              color: color,
+                            '$totalSensores sensor${totalSensores == 1 ? '' : 'es'}',
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
                               fontSize: 12,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                      ],
-                    ),
-                  ],
+                          if (alertasAtivos > 0)
+                            Text(
+                              '· $alertasAtivos alerta${alertasAtivos == 1 ? '' : 's'}',
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              const Icon(Icons.chevron_right, color: AppColors.textSecondary),
-            ],
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFF94A3B8),
+                ),
+              ],
+            ),
           ),
         ),
       ),

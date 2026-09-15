@@ -15,40 +15,57 @@ String statusLabel(SensorStatus status) {
   }
 }
 
-/// Pílula colorida indicando o status de um sensor/alerta.
+/// Pílula/Badge estruturado indicando o status de um sensor ou ambiente.
 class StatusIndicator extends StatelessWidget {
   final SensorStatus status;
   final bool compact;
 
   const StatusIndicator({super.key, required this.status, this.compact = false});
 
+  IconData _getStatusIcon(SensorStatus status) {
+    switch (status) {
+      case SensorStatus.normal:
+        return Icons.check_circle_outline_rounded;
+      case SensorStatus.atencao:
+        return Icons.error_outline_rounded;
+      case SensorStatus.critico:
+        return Icons.warning_amber_rounded;
+      case SensorStatus.offline:
+        return Icons.wifi_off_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = statusColor(status.value);
+    final icon = _getStatusIcon(status);
+
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 12,
-        vertical: compact ? 4 : 6,
+        horizontal: compact ? 8 : 10,
+        vertical: compact ? 3 : 5,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6), // Canto mais sóbrio/técnico
+        border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          Icon(
+            icon,
+            size: compact ? 12 : 14,
+            color: color,
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 5),
           Text(
-            statusLabel(status),
+            statusLabel(status).toUpperCase(),
             style: TextStyle(
               color: color,
-              fontWeight: FontWeight.w600,
-              fontSize: compact ? 12 : 13,
+              fontWeight: FontWeight.w700,
+              fontSize: compact ? 10 : 11,
+              letterSpacing: 0.5,
             ),
           ),
         ],

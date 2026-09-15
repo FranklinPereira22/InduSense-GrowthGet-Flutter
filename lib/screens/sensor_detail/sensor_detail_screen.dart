@@ -56,120 +56,150 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_sensor?.nome ?? 'Detalhes do sensor')),
+      appBar: AppBar(title: Text(_sensor?.nome ?? 'Telemetria do Sensor')),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
-    if (_carregando) return const LoadingWidget(mensagem: 'Carregando sensor...');
+    if (_carregando) return const LoadingWidget(mensagem: 'Carregando leituras...');
     if (_erro != null) return AppErrorWidget(mensagem: _erro!, onRetry: _carregar);
 
     final sensor = _sensor!;
     final leituras = List.of(_leituras ?? [])
       ..sort((a, b) => a.dataHora.compareTo(b.dataHora));
 
+    final statusCol = statusColor(sensor.status.value);
+
     return RefreshIndicator(
       onRefresh: _carregar,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(sensor.localizacao,
-                            style: const TextStyle(color: AppColors.textSecondary)),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        sensor.localizacao.toUpperCase(),
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                      StatusIndicator(status: sensor.status),
-                    ],
+                    ),
+                    StatusIndicator(status: sensor.status),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  sensor.online
+                      ? '${sensor.valorAtual.toStringAsFixed(1)} ${sensor.tipo.unidade}'
+                      : 'OFFLINE',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
+                    fontFamily: 'monospace',
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    sensor.online
-                        ? '${sensor.valorAtual.toStringAsFixed(1)} ${sensor.tipo.unidade}'
-                        : 'Sensor offline',
-                    style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Faixa ideal: ${sensor.limiteMin.toStringAsFixed(0)} a ${sensor.limiteMax.toStringAsFixed(0)} ${sensor.tipo.unidade}',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Última leitura: ${DateFormat("dd/MM/yyyy 'às' HH:mm").format(sensor.ultimaLeitura)}',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-                  ),
-                ],
-              ),
+                ),
+                const Divider(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Faixa nominal: ${sensor.limiteMin.toStringAsFixed(0)} - ${sensor.limiteMax.toStringAsFixed(0)} ${sensor.tipo.unidade}',
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                    ),
+                    Text(
+                      'Última leitura: ${DateFormat('HH:mm').format(sensor.ultimaLeitura)}',
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 20),
-          const Text('Tendência (últimas 24h)',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          const Text(
+            'Histórico de Leituras (Últimas 24 horas)',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1E293B),
+            ),
+          ),
           const SizedBox(height: 12),
           if (leituras.isEmpty)
             const EmptyStateWidget(
-              icon: Icons.show_chart,
-              titulo: 'Sem histórico',
-              mensagem: 'Ainda não há leituras registradas para este sensor.',
+              icon: Icons.show_chart_rounded,
+              titulo: 'Sem dados no histórico',
+              mensagem: 'Aguardando envio de pacotes pela rede ESP32/IoT.',
             )
           else
-            SizedBox(
-              height: 220,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 20, 20, 12),
-                  child: LineChart(
-                    LineChartData(
-                      gridData: const FlGridData(show: true, drawVerticalLine: false),
-                      titlesData: FlTitlesData(
-                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 40,
-                            getTitlesWidget: (value, meta) => Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: Text(
-                                value.toStringAsFixed(0),
-                                style: const TextStyle(
-                                    fontSize: 11, color: AppColors.textSecondary),
-                                maxLines: 1,
-                                overflow: TextOverflow.visible,
-                              ),
-                            ),
+            Container(
+              height: 230,
+              padding: const EdgeInsets.fromLTRB(12, 20, 16, 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: LineChart(
+                LineChartData(
+                  gridData: const FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: 10,
+                  ),
+                  titlesData: FlTitlesData(
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 36,
+                        getTitlesWidget: (value, meta) => Text(
+                          value.toStringAsFixed(0),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Color(0xFF94A3B8),
+                            fontFamily: 'monospace',
                           ),
                         ),
                       ),
-                      borderData: FlBorderData(show: false),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: leituras
-                              .asMap()
-                              .entries
-                              .map((e) => FlSpot(e.key.toDouble(), e.value.valor))
-                              .toList(),
-                          isCurved: true,
-                          color: statusColor(sensor.status.value),
-                          barWidth: 2.5,
-                          dotData: const FlDotData(show: false),
-                          belowBarData: BarAreaData(
-                            show: true,
-                            color: statusColor(sensor.status.value).withOpacity(0.1),
-                          ),
-                        ),
-                      ],
                     ),
                   ),
+                  borderData: FlBorderData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: leituras
+                          .asMap()
+                          .entries
+                          .map((e) => FlSpot(e.key.toDouble(), e.value.valor))
+                          .toList(),
+                      isCurved: false, // Linha reta estilo dashboard técnico de telemetria
+                      color: statusCol,
+                      barWidth: 2,
+                      dotData: const FlDotData(show: false),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: statusCol.withOpacity(0.05),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

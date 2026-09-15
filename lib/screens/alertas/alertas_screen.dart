@@ -64,11 +64,11 @@ class _AlertasScreenState extends State<AlertasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alertas'),
+        title: const Text('Logs de Alertas'),
         actions: [
           IconButton(
-            icon: Icon(_apenasNaoLidos ? Icons.filter_alt : Icons.filter_alt_outlined),
-            tooltip: 'Mostrar apenas não lidos',
+            icon: Icon(_apenasNaoLidos ? Icons.filter_alt_rounded : Icons.filter_alt_outlined),
+            tooltip: 'Mostrar apenas pendentes',
             onPressed: () => setState(() => _apenasNaoLidos = !_apenasNaoLidos),
           ),
         ],
@@ -78,7 +78,7 @@ class _AlertasScreenState extends State<AlertasScreen> {
   }
 
   Widget _buildBody() {
-    if (_carregando) return const LoadingWidget(mensagem: 'Carregando alertas...');
+    if (_carregando) return const LoadingWidget(mensagem: 'Carregando histórico de alertas...');
     if (_erro != null) return AppErrorWidget(mensagem: _erro!, onRetry: _carregar);
 
     var alertas = _alertas ?? [];
@@ -89,9 +89,9 @@ class _AlertasScreenState extends State<AlertasScreen> {
 
     if (alertas.isEmpty) {
       return const EmptyStateWidget(
-        icon: Icons.notifications_off_outlined,
-        titulo: 'Nenhum alerta',
-        mensagem: 'Você está em dia! Nenhum parâmetro excedido no momento.',
+        icon: Icons.check_circle_outline_rounded,
+        titulo: 'Sem ocorrências registradas',
+        mensagem: 'Todos os parâmetros operacionais estão dentro das faixas limites.',
       );
     }
 
@@ -100,7 +100,7 @@ class _AlertasScreenState extends State<AlertasScreen> {
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: alertas.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, __) => const SizedBox(height: 8),
         itemBuilder: (context, index) => _alertaCard(alertas[index]),
       ),
     );
@@ -108,59 +108,88 @@ class _AlertasScreenState extends State<AlertasScreen> {
 
   Widget _alertaCard(AlertModel alerta) {
     final cor = statusColor(alerta.severidade.name);
-    return Card(
-      color: alerta.lido ? null : cor.withOpacity(0.04),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: alerta.lido ? null : () => _marcarComoLido(alerta),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 10,
-                height: 10,
-                margin: const EdgeInsets.only(top: 5),
-                decoration: BoxDecoration(color: cor, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      alerta.sensorNome,
-                      style: TextStyle(
-                        fontWeight: alerta.lido ? FontWeight.w500 : FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${alerta.tipo.name} excedeu o limite: '
-                      '${alerta.valorMedido.toStringAsFixed(1)} '
-                      '(limite ${alerta.limite.toStringAsFixed(0)})',
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      DateFormat("dd/MM/yyyy 'às' HH:mm").format(alerta.dataHora),
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              if (!alerta.lido)
+
+    return Container(
+      decoration: BoxDecoration(
+        color: alerta.lido ? Colors.white : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: alerta.lido ? const Color(0xFFE2E8F0) : cor.withOpacity(0.5),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(6),
+        child: InkWell(
+          onTap: alerta.lido ? null : () => _marcarComoLido(alerta),
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                // Barra lateral indicadora da gravidade da ocorrência
                 Container(
-                  margin: const EdgeInsets.only(left: 8, top: 4),
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
+                  width: 4,
+                  color: cor,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                alerta.sensorNome,
+                                style: TextStyle(
+                                  fontWeight: alerta.lido ? FontWeight.w600 : FontWeight.bold,
+                                  fontSize: 14,
+                                  color: const Color(0xFF1E293B),
+                                ),
+                              ),
+                            ),
+                            if (!alerta.lido)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: cor.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'PENDENTE',
+                                  style: TextStyle(
+                                    color: cor,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${alerta.tipo.name.toUpperCase()} excedeu o limite máximo: '
+                          '${alerta.valorMedido.toStringAsFixed(1)} (Limite: ${alerta.limite.toStringAsFixed(0)})',
+                          style: const TextStyle(
+                            color: Color(0xFF475569),
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          DateFormat("dd/MM/yyyy · HH:mm:ss").format(alerta.dataHora),
+                          style: const TextStyle(
+                            color: Color(0xFF94A3B8),
+                            fontSize: 11,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

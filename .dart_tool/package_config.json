@@ -2,6 +2,18 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "archive",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/archive-4.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "args",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/args-2.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "async",
       "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/async-2.13.1",
       "packageUri": "lib/",
@@ -16,6 +28,18 @@
     {
       "name": "characters",
       "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/characters-1.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "checked_yaml",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/checked_yaml-2.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
+      "name": "cli_util",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/cli_util-0.4.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -74,6 +98,12 @@
       "languageVersion": "3.11"
     },
     {
+      "name": "flutter_launcher_icons",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/flutter_launcher_icons-0.13.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "flutter_lints",
       "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/flutter_lints-4.0.0",
       "packageUri": "lib/",
@@ -110,8 +140,20 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "image",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/image-4.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "intl",
       "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/intl-0.20.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
+      "name": "json_annotation",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/json_annotation-4.12.0",
       "packageUri": "lib/",
       "languageVersion": "3.9"
     },
@@ -214,6 +256,12 @@
     {
       "name": "plugin_platform_interface",
       "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/plugin_platform_interface-2.1.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "posix",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/posix-6.5.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -336,6 +384,12 @@
       "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/xdg_directories-1.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "yaml",
+      "rootUri": "file:///home/senai-2deva/.pub-cache/hosted/pub.dev/yaml-3.1.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "indusense",

@@ -7,18 +7,16 @@ import 'status_indicator.dart';
 IconData _iconForType(SensorType tipo) {
   switch (tipo) {
     case SensorType.temperatura:
-      return Icons.thermostat_outlined;
+      return Icons.thermostat_rounded;
     case SensorType.umidade:
-      return Icons.water_drop_outlined;
+      return Icons.water_drop_rounded;
     case SensorType.qualidadeAr:
-      return Icons.air_outlined;
+      return Icons.air_rounded;
     case SensorType.gas:
-      return Icons.cloud_outlined;
+      return Icons.sensors_rounded;
   }
 }
 
-/// Card usado no Dashboard e em listagens, exibindo o valor atual,
-/// status e última leitura de um sensor.
 class SensorCard extends StatelessWidget {
   final SensorModel sensor;
   final VoidCallback? onTap;
@@ -27,85 +25,72 @@ class SensorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = statusColor(sensor.status.value);
-    return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(_iconForType(sensor.tipo), color: color),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          sensor.nome,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(_iconForType(sensor.tipo), size: 18, color: const Color(0xFF64748B)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        sensor.nome,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: Color(0xFF1E293B),
                         ),
-                        Text(
-                          sensor.localizacao,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              // Empilhado (não em Row+Spacer) para nunca estourar a
-              // largura do card em telas estreitas ou grids com 2+
-              // colunas — o valor pode ser longo (ex: "168.0 IQA").
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  sensor.online
-                      ? '${sensor.valorAtual.toStringAsFixed(1)} ${sensor.tipo.unidade}'
-                      : '—',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                  ],
+                ),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    sensor.online
+                        ? '${sensor.valorAtual.toStringAsFixed(1)} ${sensor.tipo.unidade}'
+                        : '—',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A),
+                      fontFamily: 'monospace',
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              StatusIndicator(status: sensor.status, compact: true),
-              const SizedBox(height: 8),
-              Text(
-                'Atualizado às ${DateFormat('HH:mm').format(sensor.ultimaLeitura)}',
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 11,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StatusIndicator(status: sensor.status, compact: true),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Atualizado ${DateFormat('HH:mm').format(sensor.ultimaLeitura)}',
+                      style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

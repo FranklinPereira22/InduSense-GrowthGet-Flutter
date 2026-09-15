@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 
-/// Indicador de carregamento padrão do app.
 class LoadingWidget extends StatelessWidget {
   final String? mensagem;
   const LoadingWidget({super.key, this.mensagem});
@@ -12,10 +11,20 @@ class LoadingWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CircularProgressIndicator(color: AppColors.primary),
+          const SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(
+              color: Color(0xFF1E293B),
+              strokeWidth: 2.5,
+            ),
+          ),
           if (mensagem != null) ...[
             const SizedBox(height: 16),
-            Text(mensagem!, style: const TextStyle(color: AppColors.textSecondary)),
+            Text(
+              mensagem!,
+              style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+            ),
           ],
         ],
       ),
@@ -23,7 +32,6 @@ class LoadingWidget extends StatelessWidget {
   }
 }
 
-/// Estado vazio (sem sensores, sem histórico, sem alertas...).
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String titulo;
@@ -44,21 +52,21 @@ class EmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56, color: AppColors.textSecondary),
-            const SizedBox(height: 16),
+            Icon(icon, size: 40, color: const Color(0xFF94A3B8)),
+            const SizedBox(height: 12),
             Text(
               titulo,
               style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E293B),
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               mensagem,
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
               textAlign: TextAlign.center,
             ),
           ],
@@ -68,7 +76,6 @@ class EmptyStateWidget extends StatelessWidget {
   }
 }
 
-/// Estado de erro com opção de tentar novamente.
 class AppErrorWidget extends StatelessWidget {
   final String mensagem;
   final VoidCallback? onRetry;
@@ -83,18 +90,21 @@ class AppErrorWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 56, color: AppColors.statusCritico),
-            const SizedBox(height: 16),
+            const Icon(Icons.error_outline_rounded, size: 40, color: AppColors.statusCritico),
+            const SizedBox(height: 12),
             Text(
               mensagem,
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: const TextStyle(color: Color(0xFF1E293B), fontSize: 14),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
-              ElevatedButton(
+              OutlinedButton(
                 onPressed: onRetry,
-                style: ElevatedButton.styleFrom(minimumSize: const Size(140, 44)),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(140, 40),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                ),
                 child: const Text('Tentar novamente'),
               ),
             ],

@@ -6,8 +6,6 @@ import '../../services/sala_service.dart';
 import '../../widgets/sensor_card.dart';
 import '../../widgets/state_widgets.dart';
 
-/// Sensores de uma sala específica. É a tela para onde o app navega
-/// automaticamente após ler a tag NFC fixada na porta da sala.
 class SalaDetailScreen extends StatefulWidget {
   final String salaId;
   const SalaDetailScreen({super.key, required this.salaId});
@@ -56,13 +54,13 @@ class _SalaDetailScreenState extends State<SalaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_sala?.nome ?? 'Sala')),
+      appBar: AppBar(title: Text(_sala?.nome ?? 'Ambiente')),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
-    if (_carregando) return const LoadingWidget(mensagem: 'Carregando sensores...');
+    if (_carregando) return const LoadingWidget(mensagem: 'Sincronizando ambiente...');
     if (_erro != null) return AppErrorWidget(mensagem: _erro!, onRetry: _carregar);
 
     final sala = _sala!;
@@ -73,57 +71,68 @@ class _SalaDetailScreenState extends State<SalaDetailScreen> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.meeting_room_outlined,
-                        color: AppColors.primary),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(sala.setor,
-                            style: const TextStyle(
-                                color: AppColors.textSecondary, fontSize: 12)),
-                        Text('${sensores.length} sensores nesta sala',
-                            style: const TextStyle(fontWeight: FontWeight.w500)),
-                      ],
-                    ),
+                  child: const Icon(Icons.factory_outlined, color: Color(0xFF1E293B)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        sala.setor.toUpperCase(),
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${sensores.length} dispositivos cadastrados',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 20),
           if (sensores.isEmpty)
             const EmptyStateWidget(
-              icon: Icons.sensors_off_outlined,
-              titulo: 'Nenhum sensor nesta sala',
-              mensagem: 'Vincule um sensor ESP32/IoT a esta sala para monitorá-la.',
+              icon: Icons.sensors_off_rounded,
+              titulo: 'Nenhum sensor vinculado',
+              mensagem: 'Cadastre um módulo ESP32/IoT nesta área para iniciar a telemetria.',
             )
           else
-            // MaxCrossAxisExtent + mainAxisExtent fixo (em vez de
-            // childAspectRatio) deixa o número de colunas responsivo
-            // ao tamanho real da tela (celular x tablet) e evita que o
-            // conteúdo do card seja espremido/estourado verticalmente.
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: sensores.length,
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 190,
-                mainAxisExtent: 190,
+                maxCrossAxisExtent: 220,
+                mainAxisExtent: 200,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
               ),

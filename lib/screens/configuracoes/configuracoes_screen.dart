@@ -46,20 +46,25 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Card(
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 28,
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                    radius: 26,
+                    backgroundColor: const Color(0xFF1E293B),
                     child: Text(
                       (user?.nome.isNotEmpty == true ? user!.nome[0] : '?').toUpperCase(),
                       style: const TextStyle(
-                        color: AppColors.primary,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 18,
                       ),
                     ),
                   ),
@@ -69,14 +74,14 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(user?.nome ?? '—',
-                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1E293B))),
                         const SizedBox(height: 2),
                         Text(user?.email ?? '—',
-                            style: const TextStyle(color: AppColors.textSecondary)),
+                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
                         if (user?.empresa != null && user!.empresa!.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(user.empresa!,
-                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500)),
                         ],
                       ],
                     ),
@@ -86,9 +91,14 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('Notificações', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+          const Text('Notificações', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1E293B))),
           const SizedBox(height: 8),
           Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: const BorderSide(color: Color(0xFFE2E8F0)),
+            ),
             child: Column(
               children: [
                 SwitchListTile(
@@ -113,9 +123,14 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('Conta', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+          const Text('Conta', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1E293B))),
           const SizedBox(height: 8),
           Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: const BorderSide(color: Color(0xFFE2E8F0)),
+            ),
             child: Column(
               children: [
                 ListTile(
@@ -145,8 +160,9 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
             icon: const Icon(Icons.logout, color: AppColors.statusCritico),
             label: const Text('Sair', style: TextStyle(color: AppColors.statusCritico)),
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size.fromHeight(50),
+              minimumSize: const Size.fromHeight(48),
               side: const BorderSide(color: AppColors.statusCritico),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
         ],

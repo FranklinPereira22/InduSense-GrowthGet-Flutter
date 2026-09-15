@@ -78,7 +78,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.of(context).pushNamed('/nfc-scan'),
-        icon: const Icon(Icons.nfc),
+        icon: const Icon(Icons.qr_code_scanner_rounded),
         label: const Text('Escanear sala'),
       ),
       body: RefreshIndicator(
@@ -115,16 +115,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
       children: [
         if (nomeUsuario != null) ...[
-          Text('Olá, $nomeUsuario 👋',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          Text('Olá, $nomeUsuario',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
           const SizedBox(height: 4),
           const Text('Visão geral dos ambientes monitorados',
-              style: TextStyle(color: AppColors.textSecondary)),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
           const SizedBox(height: 20),
         ],
-        // LayoutBuilder garante que os 4 chips de resumo nunca estourem
-        // a largura em telas pequenas: eles quebram em 2 linhas se
-        // necessário, em vez de forçar 4 colunas fixas.
         LayoutBuilder(
           builder: (context, constraints) {
             final chips = [
@@ -144,7 +141,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               );
             }
-            // Tela muito estreita: 2 colunas x 2 linhas.
             return Column(
               children: [
                 Row(children: [
@@ -164,7 +160,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         const SizedBox(height: 24),
         const Text('Salas',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
         const SizedBox(height: 4),
         const Text(
           'Toque em uma sala para ver os sensores, ou use a tag NFC na porta.',
@@ -185,10 +181,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _resumoChip(String label, int valor, Color cor) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: cor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -197,8 +194,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: cor)),
           const SizedBox(height: 2),
           Text(
-            label,
-            style: TextStyle(fontSize: 11, color: cor),
+            label.toUpperCase(),
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: cor, letterSpacing: 0.5),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

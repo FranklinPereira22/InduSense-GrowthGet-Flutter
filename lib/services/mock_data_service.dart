@@ -10,8 +10,8 @@ import '../models/user_model.dart';
 class MockDataService {
   static final UserModel _mockUser = UserModel(
     id: 'u1',
-    nome: 'Carlos Andrade',
-    email: 'carlos.andrade@growthget.com',
+    nome: 'Franklin Pereira',
+    email: 'franklin.pereira@growthget.com',
     cargo: 'Engenheiro de Processos',
     empresa: 'Growth Get Indústria',
   );
