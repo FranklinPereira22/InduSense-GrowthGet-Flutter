@@ -28,7 +28,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _carregar();
-    // Simula atualização em tempo real dos sensores IoT/ESP32.
     _autoRefresh = Timer.periodic(
         const Duration(seconds: 30), (_) => _carregar(silencioso: true));
   }
@@ -67,22 +66,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final user = context.watch<AuthProvider>().user;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () => Navigator.of(context).pushNamed('/alertas'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          'Dashboard',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(width: 4),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Material(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(20),
+              elevation: 2,
+              shadowColor: Colors.black12,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => Navigator.of(context).pushNamed('/alertas'),
+                child: const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Icon(
+                    Icons.notifications_outlined,
+                    color: Color(0xFF64748B),
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        elevation: 4,
+        backgroundColor: const Color(0xFF0EA5E9),
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         onPressed: () => Navigator.of(context).pushNamed('/nfc-scan'),
         icon: const Icon(Icons.qr_code_scanner_rounded),
-        label: const Text('Escanear sala'),
+        label: const Text('Escanear sala', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: RefreshIndicator(
         onRefresh: _carregar,
+        color: const Color(0xFF0EA5E9),
         child: _buildBody(user?.nome),
       ),
     );
@@ -112,14 +140,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final offline = todosSensores.where((s) => !s.online).length;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
       children: [
         if (nomeUsuario != null) ...[
-          Text('Olá, $nomeUsuario',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+          Text(
+            'Olá, $nomeUsuario',
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ),
+          ),
           const SizedBox(height: 4),
-          const Text('Visão geral dos ambientes monitorados',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+          const Text(
+            'Visão geral dos ambientes monitorados',
+            style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+          ),
           const SizedBox(height: 20),
         ],
         LayoutBuilder(
@@ -158,17 +194,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           },
         ),
-        const SizedBox(height: 24),
-        const Text('Salas',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+        const SizedBox(height: 28),
+        const Text(
+          'Salas',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 4),
         const Text(
           'Toque em uma sala para ver os sensores, ou use a tag NFC na porta.',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+          style: TextStyle(color: Color(0xFF64748B), fontSize: 12),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         ...salas.map((sala) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 14),
               child: SalaCard(
                 salaComSensores: sala,
                 onTap: () => Navigator.of(context)
@@ -181,21 +219,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _resumoChip(String label, int valor, Color cor) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$valor',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: cor)),
-          const SizedBox(height: 2),
+          Text(
+            '$valor',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: cor),
+          ),
+          const SizedBox(height: 4),
           Text(
             label.toUpperCase(),
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: cor, letterSpacing: 0.5),
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+              color: cor,
+              letterSpacing: 0.6,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

@@ -20,7 +20,7 @@ dependencies:
   http: ^1.2.1
 
   # Persistência local (sessão / token)
-  shared_preferences: ^2.2.3
+  shared_preferences: ^2.5.5
 
   # Gráficos do histórico
   fl_chart: ^0.68.0

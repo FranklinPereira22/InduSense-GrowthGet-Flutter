@@ -3,8 +3,6 @@ import '../core/theme/app_theme.dart';
 import '../models/sala_model.dart';
 import 'status_indicator.dart';
 
-/// Card de uma sala no Dashboard: nome, setor, quantidade de sensores
-/// e o status geral (o pior status entre os sensores da sala).
 class SalaCard extends StatelessWidget {
   final SalaComSensores salaComSensores;
   final VoidCallback? onTap;
@@ -21,33 +19,39 @@ class SalaCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)), // Borda neutra corporativa
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(24),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             child: Row(
               children: [
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9), // Fundo neutro Slate
-                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFF0EA5E9).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: const Icon(
-                    Icons.factory_outlined, // Ícone industrial
-                    color: Color(0xFF1E293B),
-                    size: 24,
+                    Icons.factory_rounded,
+                    color: Color(0xFF0EA5E9),
+                    size: 26,
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,8 +60,7 @@ class SalaCard extends StatelessWidget {
                         sala.nome,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Color(0xFF1E293B),
+                          fontSize: 16,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -66,7 +69,7 @@ class SalaCard extends StatelessWidget {
                       Text(
                         sala.setor,
                         style: const TextStyle(
-                          color: AppColors.textSecondary,
+                          color: Color(0xFF64748B),
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -83,8 +86,9 @@ class SalaCard extends StatelessWidget {
                           Text(
                             '$totalSensores sensor${totalSensores == 1 ? '' : 'es'}',
                             style: const TextStyle(
-                              color: AppColors.textSecondary,
+                              color: Color(0xFF64748B),
                               fontSize: 12,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           if (alertasAtivos > 0)
@@ -105,6 +109,7 @@ class SalaCard extends StatelessWidget {
                 const Icon(
                   Icons.chevron_right_rounded,
                   color: Color(0xFF94A3B8),
+                  size: 24,
                 ),
               ],
             ),

@@ -56,7 +56,21 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_sensor?.nome ?? 'Telemetria do Sensor')),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          _sensor?.nome ?? 'Telemetria do Sensor',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: _buildBody(),
     );
   }
@@ -73,15 +87,22 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
 
     return RefreshIndicator(
       onRefresh: _carregar,
+      color: const Color(0xFF0EA5E9),
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,55 +110,86 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        sensor.localizacao.toUpperCase(),
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0EA5E9).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          sensor.localizacao.toUpperCase(),
+                          style: const TextStyle(
+                            color: Color(0xFF0EA5E9),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.6,
+                          ),
                         ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     StatusIndicator(status: sensor.status),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Text(
                   sensor.online
                       ? '${sensor.valorAtual.toStringAsFixed(1)} ${sensor.tipo.unidade}'
                       : 'OFFLINE',
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
-                    fontFamily: 'monospace',
+                  style: TextStyle(
+                    fontSize: 38,
+                    fontWeight: FontWeight.w800,
+                    color: sensor.online ? null : AppColors.statusOffline,
+                    letterSpacing: -1,
                   ),
                 ),
-                const Divider(height: 24),
+                const SizedBox(height: 16),
+                const Divider(height: 1),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Faixa nominal: ${sensor.limiteMin.toStringAsFixed(0)} - ${sensor.limiteMax.toStringAsFixed(0)} ${sensor.tipo.unidade}',
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Faixa nominal',
+                            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${sensor.limiteMin.toStringAsFixed(0)} - ${sensor.limiteMax.toStringAsFixed(0)} ${sensor.tipo.unidade}',
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      'Última leitura: ${DateFormat('HH:mm').format(sensor.ultimaLeitura)}',
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text(
+                          'Última leitura',
+                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          DateFormat('HH:mm').format(sensor.ultimaLeitura),
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           const Text(
             'Histórico de Leituras (Últimas 24 horas)',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
             ),
           ),
           const SizedBox(height: 12),
@@ -149,12 +201,18 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
             )
           else
             Container(
-              height: 230,
-              padding: const EdgeInsets.fromLTRB(12, 20, 16, 12),
+              height: 240,
+              padding: const EdgeInsets.fromLTRB(12, 20, 20, 12),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
               child: LineChart(
                 LineChartData(
@@ -170,13 +228,16 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 36,
-                        getTitlesWidget: (value, meta) => Text(
-                          value.toStringAsFixed(0),
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF94A3B8),
-                            fontFamily: 'monospace',
+                        reservedSize: 40,
+                        getTitlesWidget: (value, meta) => Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: Text(
+                            value.toStringAsFixed(0),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Color(0xFF94A3B8),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -190,13 +251,13 @@ class _SensorDetailScreenState extends State<SensorDetailScreen> {
                           .entries
                           .map((e) => FlSpot(e.key.toDouble(), e.value.valor))
                           .toList(),
-                      isCurved: false, // Linha reta estilo dashboard técnico de telemetria
+                      isCurved: true,
                       color: statusCol,
-                      barWidth: 2,
+                      barWidth: 3,
                       dotData: const FlDotData(show: false),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: statusCol.withOpacity(0.05),
+                        color: statusCol.withOpacity(0.1),
                       ),
                     ),
                   ],

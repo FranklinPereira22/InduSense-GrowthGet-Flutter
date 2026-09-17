@@ -64,12 +64,37 @@ class _AlertasScreenState extends State<AlertasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Logs de Alertas'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        title: const Text(
+          'Logs de Alertas',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: Icon(_apenasNaoLidos ? Icons.filter_alt_rounded : Icons.filter_alt_outlined),
-            tooltip: 'Mostrar apenas pendentes',
-            onPressed: () => setState(() => _apenasNaoLidos = !_apenasNaoLidos),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Material(
+              color: _apenasNaoLidos ? const Color(0xFF0EA5E9) : Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(20),
+              elevation: 2,
+              shadowColor: Colors.black12,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => setState(() => _apenasNaoLidos = !_apenasNaoLidos),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(
+                    _apenasNaoLidos ? Icons.filter_alt_rounded : Icons.filter_alt_outlined,
+                    color: _apenasNaoLidos ? Colors.white : const Color(0xFF64748B),
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -97,10 +122,11 @@ class _AlertasScreenState extends State<AlertasScreen> {
 
     return RefreshIndicator(
       onRefresh: _carregar,
+      color: const Color(0xFF0EA5E9),
       child: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         itemCount: alertas.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        separatorBuilder: (_, __) => const SizedBox(height: 14),
         itemBuilder: (context, index) => _alertaCard(alertas[index]),
       ),
     );
@@ -111,81 +137,108 @@ class _AlertasScreenState extends State<AlertasScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: alerta.lido ? Colors.white : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(6),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: alerta.lido ? const Color(0xFFE2E8F0) : cor.withOpacity(0.5),
+          color: alerta.lido ? Colors.transparent : cor.withOpacity(0.5),
+          width: 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(24),
         child: InkWell(
+          borderRadius: BorderRadius.circular(24),
           onTap: alerta.lido ? null : () => _marcarComoLido(alerta),
-          child: IntrinsicHeight(
+          child: Padding(
+            padding: const EdgeInsets.all(18),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Barra lateral indicadora da gravidade da ocorrência
                 Container(
-                  width: 4,
-                  color: cor,
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: cor.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    alerta.lido ? Icons.notifications_none_rounded : Icons.warning_amber_rounded,
+                    color: cor,
+                    size: 22,
+                  ),
                 ),
+                const SizedBox(width: 14),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              alerta.sensorNome,
+                              style: TextStyle(
+                                fontWeight: alerta.lido ? FontWeight.w600 : FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          if (!alerta.lido)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: cor.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                               child: Text(
-                                alerta.sensorNome,
+                                'PENDENTE',
                                 style: TextStyle(
-                                  fontWeight: alerta.lido ? FontWeight.w600 : FontWeight.bold,
-                                  fontSize: 14,
-                                  color: const Color(0xFF1E293B),
+                                  color: cor,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
                                 ),
                               ),
                             ),
-                            if (!alerta.lido)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: cor.withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  'PENDENTE',
-                                  style: TextStyle(
-                                    color: cor,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${alerta.tipo.name.toUpperCase()} excedeu o limite máximo: '
+                        '${alerta.valorMedido.toStringAsFixed(1)} (Limite: ${alerta.limite.toStringAsFixed(0)})',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                          height: 1.3,
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${alerta.tipo.name.toUpperCase()} excedeu o limite máximo: '
-                          '${alerta.valorMedido.toStringAsFixed(1)} (Limite: ${alerta.limite.toStringAsFixed(0)})',
-                          style: const TextStyle(
-                            color: Color(0xFF475569),
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          DateFormat("dd/MM/yyyy · HH:mm:ss").format(alerta.dataHora),
-                          style: const TextStyle(
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time_rounded,
+                            size: 13,
                             color: Color(0xFF94A3B8),
-                            fontSize: 11,
-                            fontFamily: 'monospace',
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 4),
+                          Text(
+                            DateFormat("dd/MM/yyyy · HH:mm:ss").format(alerta.dataHora),
+                            style: const TextStyle(
+                              color: Color(0xFF94A3B8),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],

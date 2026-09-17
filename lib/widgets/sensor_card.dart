@@ -27,24 +27,37 @@ class SensorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(24),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(_iconForType(sensor.tipo), size: 18, color: const Color(0xFF64748B)),
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0EA5E9).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(_iconForType(sensor.tipo), size: 16, color: const Color(0xFF0EA5E9)),
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -52,7 +65,6 @@ class SensorCard extends StatelessWidget {
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
-                          color: Color(0xFF1E293B),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -67,11 +79,11 @@ class SensorCard extends StatelessWidget {
                     sensor.online
                         ? '${sensor.valorAtual.toStringAsFixed(1)} ${sensor.tipo.unidade}'
                         : '—',
-                    style: const TextStyle(
-                      fontSize: 22,
+                    style: TextStyle(
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
-                      fontFamily: 'monospace',
+                      color: sensor.online ? null : AppColors.statusOffline,
+                      letterSpacing: -0.5,
                     ),
                   ),
                 ),
@@ -85,6 +97,7 @@ class SensorCard extends StatelessWidget {
                       style: const TextStyle(
                         color: Color(0xFF94A3B8),
                         fontSize: 10,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],

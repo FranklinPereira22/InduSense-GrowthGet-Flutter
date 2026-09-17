@@ -54,7 +54,21 @@ class _SalaDetailScreenState extends State<SalaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_sala?.nome ?? 'Ambiente')),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          _sala?.nome ?? 'Ambiente',
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: _buildBody(),
     );
   }
@@ -68,48 +82,65 @@ class _SalaDetailScreenState extends State<SalaDetailScreen> {
 
     return RefreshIndicator(
       onRefresh: _carregar,
+      color: const Color(0xFF0EA5E9),
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Row(
               children: [
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(6),
+                    color: const Color(0xFF0EA5E9).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(Icons.factory_outlined, color: Color(0xFF1E293B)),
+                  child: const Icon(
+                    Icons.factory_rounded,
+                    color: Color(0xFF0EA5E9),
+                    size: 24,
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        sala.setor.toUpperCase(),
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0EA5E9).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          sala.setor.toUpperCase(),
+                          style: const TextStyle(
+                            color: Color(0xFF0EA5E9),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.6,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 6),
                       Text(
                         '${sensores.length} dispositivos cadastrados',
                         style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Color(0xFF1E293B),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
                         ),
                       ),
                     ],
@@ -118,7 +149,7 @@ class _SalaDetailScreenState extends State<SalaDetailScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           if (sensores.isEmpty)
             const EmptyStateWidget(
               icon: Icons.sensors_off_rounded,
@@ -133,8 +164,8 @@ class _SalaDetailScreenState extends State<SalaDetailScreen> {
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 220,
                 mainAxisExtent: 200,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
               ),
               itemBuilder: (context, index) {
                 final sensor = sensores[index];

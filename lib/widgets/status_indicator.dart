@@ -25,11 +25,11 @@ class StatusIndicator extends StatelessWidget {
   IconData _getStatusIcon(SensorStatus status) {
     switch (status) {
       case SensorStatus.normal:
-        return Icons.check_circle_outline_rounded;
+        return Icons.check_circle_rounded;
       case SensorStatus.atencao:
-        return Icons.error_outline_rounded;
+        return Icons.error_rounded;
       case SensorStatus.critico:
-        return Icons.warning_amber_rounded;
+        return Icons.warning_rounded;
       case SensorStatus.offline:
         return Icons.wifi_off_rounded;
     }
@@ -42,13 +42,12 @@ class StatusIndicator extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 10,
-        vertical: compact ? 3 : 5,
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 4 : 6,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6), // Canto mais sóbrio/técnico
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -63,9 +62,9 @@ class StatusIndicator extends StatelessWidget {
             statusLabel(status).toUpperCase(),
             style: TextStyle(
               color: color,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800,
               fontSize: compact ? 10 : 11,
-              letterSpacing: 0.5,
+              letterSpacing: 0.6,
             ),
           ),
         ],

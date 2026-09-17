@@ -12,18 +12,22 @@ class LoadingWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(
-            width: 28,
-            height: 28,
+            width: 32,
+            height: 32,
             child: CircularProgressIndicator(
-              color: Color(0xFF1E293B),
-              strokeWidth: 2.5,
+              color: Color(0xFF0EA5E9),
+              strokeWidth: 3,
             ),
           ),
           if (mensagem != null) ...[
             const SizedBox(height: 16),
             Text(
               mensagem!,
-              style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+              style: const TextStyle(
+                color: Color(0xFF64748B),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ],
@@ -52,18 +56,25 @@ class EmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 40, color: const Color(0xFF94A3B8)),
-            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 36, color: const Color(0xFF94A3B8)),
+            ),
+            const SizedBox(height: 16),
             Text(
               titulo,
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
+                color: Color(0xFF0F172A),
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               mensagem,
               style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
@@ -90,22 +101,41 @@ class AppErrorWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 40, color: AppColors.statusCritico),
-            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.statusCritico.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                size: 36,
+                color: AppColors.statusCritico,
+              ),
+            ),
+            const SizedBox(height: 16),
             Text(
               mensagem,
-              style: const TextStyle(color: Color(0xFF1E293B), fontSize: 14),
+              style: const TextStyle(
+                color: Color(0xFF0F172A),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: 16),
-              OutlinedButton(
+              const SizedBox(height: 20),
+              FilledButton.icon(
                 onPressed: onRetry,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(140, 40),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Tentar novamente'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF0EA5E9),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
                 ),
-                child: const Text('Tentar novamente'),
               ),
             ],
           ],
